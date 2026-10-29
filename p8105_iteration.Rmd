@@ -1,5 +1,5 @@
 ---
-title: "Writing Functions"
+title: "Writing Functions I"
 output: github_document
 ---
 
@@ -62,5 +62,54 @@ z_scores(iris)
 z_scores("my name is emma") 
 z_scores(c(TRUE, TRUE, FALSE, FALSE))
 z_scores(3)
+```
+
+
+### mean and sd
+
+```{r}
+mean(x_vec)
+sd(x_vec)
+```
+
+write a fxn that returns the mean and sd of an input vector.
+
+```{r}
+source("source/mean_and_sd.R")
+```
+
+check that this works
+```{r}
+mean_and_sd(x_vec)
+```
+
+## Motive and write another one!!
+
+```{r}
+sim_df = 
+  tibble(
+    x = rnorm(n=40, mean = 12, sd = 3)
+  )
+
+sim_df |> 
+  summarize(
+    mean = mean(x),
+    sd = sd(x)
+  )
+```
+```{r}
+source("source/sim_mean_sd.R")
+```
+
+```{r}
+sim_mean_sd(n_obs = 40, mu = 12, sigma = 3)
+
+sim_mean_sd(50, 12, 3)
+
+sim_mean_sd(mu = 12, n_obs = 40, sigma = 3)
+
+sim_mean_sd(12, n_obs = 40, 3) # also works --> assumes is in right order
+
+sim_mean_sd(50) # if default values are set
 ```
 
