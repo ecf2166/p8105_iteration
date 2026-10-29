@@ -5,6 +5,8 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(readxl)
+library(rvest)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -111,5 +113,77 @@ sim_mean_sd(mu = 12, n_obs = 40, sigma = 3)
 sim_mean_sd(12, n_obs = 40, 3) # also works --> assumes is in right order
 
 sim_mean_sd(50) # if default values are set
+```
+
+## Fix things that bother me
+
+This bothered me 
+
+```{r}
+# original
+fellowship_df = read_excel("data/LoTR_Words.xlsx", range = "B3:D6") |> 
+  mutate(movie = "fellowship")
+
+two_tower_df = read_excel("data/LoTR_Words.xlsx", range = "F3:H6") |> 
+  mutate(movie = "two_towers")
+
+return_df = read_excel("data/LoTR_Words.xlsx", range = "J3:L6") |> 
+  mutate(movie = "return_of_king")
+
+#fixed
+source("source/read_lotr.R")
+
+fellowship_df = read_lotr(r = "B3:D6", m = "fellowship")
+two_tower_df = read_lotr(r = "F3:H6", m = "two_towers")
+return_df = read_lotr(r = "J3:L6", m = "return_of_king")
+```
+
+and now it's fixed
+
+```{r}
+# original
+nsduh_url = "https://www.samhsa.gov/data/sites/default/files/NSDUHsaeShortTermCHG2015/NSDUHsaeShortTermCHG2015.htm"
+drug_use_html = read_html(nsduh_url)
+
+marj_df = 
+  read_html(nsduh_url) |> 
+  html_table() |> 
+  nth(1) |>
+  slice(-1) |> 
+  select(-contains("P Value")) |>
+  pivot_longer(
+    -State,
+    names_to = "age_year", 
+    values_to = "percent") |>
+  separate(age_year, into = c("age", "year"), sep = "\\(") |>
+  mutate(
+    year = str_replace(year, "\\)", ""),
+    percent = str_replace(percent, "[a-c]$", ""),
+    percent = as.numeric(percent)) |>
+  filter(!(State %in% c("Total U.S.", "Northeast", "Midwest", "South", "West")))
+
+cocaine_df = 
+  read_html(nsduh_url) |> 
+  html_table() |> 
+  nth(4) |>
+  slice(-1) |> 
+  select(-contains("P Value")) |>
+  pivot_longer(
+    -State,
+    names_to = "age_year", 
+    values_to = "percent") |>
+  separate(age_year, into = c("age", "year"), sep = "\\(") |>
+  mutate(
+    year = str_replace(year, "\\)", ""),
+    percent = str_replace(percent, "[a-c]$", ""),
+    percent = as.numeric(percent)) |>
+  filter(!(State %in% c("Total U.S.", "Northeast", "Midwest", "South", "West")))
+
+# fixed
+
+source("source/nsduh_process.R")
+
+marj_df = nsduh_process(drug_use_html, 1)
+cocaine_df = nsduh_process(drug_use_html, 4)
 ```
 
