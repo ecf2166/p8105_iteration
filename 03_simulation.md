@@ -191,6 +191,16 @@ slr_results_df =
 
 is this right?
 
+``` r
+# not sure why this isn't working
+
+slr_results_df = 
+  summarize(
+    b0_mean = mean(beta0_hat),
+    b0_sd = sd(beta0_hat)
+  )
+```
+
 look at the results
 
 ``` r
@@ -199,4 +209,54 @@ slr_results_df |>
   geom_point()
 ```
 
-<img src="03_simulation_files/figure-gfm/unnamed-chunk-14-1.png" alt="" width="90%" />
+<img src="03_simulation_files/figure-gfm/unnamed-chunk-15-1.png" alt="" width="90%" />
+
+## birthday problem
+
+``` r
+birthdays = sample(1:365, size = 5, replace = TRUE)
+
+repeated_birthdays = length(unique(birthdays))<5
+
+repeated_birthdays
+```
+
+    ## [1] FALSE
+
+Turn this into a function
+
+(i did)
+
+``` r
+source("source/birthday_repeated.R")
+
+birthday_repeated(147)
+```
+
+    ## [1] TRUE
+
+``` r
+birthday_results_df = 
+  expand_grid(
+    number_of_people = 5:50,
+    iter = 1:1000
+  ) |> 
+  mutate(
+    repeated = map_lgl(number_of_people, birthday_repeated)
+  )
+```
+
+look at these results
+
+``` r
+birthday_results_df |> 
+  group_by(number_of_people) |> 
+  summarize(
+    prob_of_repeat = mean(repeated)
+  ) |> 
+  ggplot(aes(x = number_of_people, y = prob_of_repeat)) + 
+  geom_line() + 
+  geom_point()
+```
+
+<img src="03_simulation_files/figure-gfm/unnamed-chunk-19-1.png" alt="" width="90%" />
